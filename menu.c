@@ -38,7 +38,7 @@ void initMenu(Menu* menu, char menuHeadNames[][MENU_ITEM_SIZE], int subMenus) {
 		insert(&menu->head, menuHeadNames[i]);
 	}
 	menu->subMenus = subMenus;
-	menu->subMenuHeads = (Node*)calloc(subMenus, sizeof(Node));
+	menu->subMenuHeads = (Node**)calloc((size_t)subMenus, sizeof(Node));
 	for(i = 0; i < subMenus; i++) {
 		*(menu->subMenuHeads + i) = NULL;
 	}
@@ -61,7 +61,7 @@ void displayMenu(Menu* menu, Node* item, Node* subItem) {
 	}
 	printf("\n\n");
 	
-	Node** currentHeads = (Node*)calloc(menu->subMenus, sizeof(Node));
+	Node** currentHeads = (Node**)calloc((size_t)menu->subMenus, sizeof(Node));
 	for(i = 0; i < menu->subMenus; i++) {
 		*(currentHeads + i) = *(menu->subMenuHeads + i);
 	}
