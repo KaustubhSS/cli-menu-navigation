@@ -49,20 +49,17 @@ void insertSubMenuItem(Menu* menu, int subMenu, const char* text) {
 	insert(menu->subMenuHeads + subMenu, text);
 }
 
-void displayMenu(Menu* menu, int menuItem, int subMenuItem) {
+void displayMenu(Menu* menu, Node* item, Node* subItem) {
 	int i = 0;
-	int j = -1;
 	int allNull = 0;
 	Node* current = menu->head;
 	system("cls || clear");
 	while(current != NULL) {
-		if (menuItem == i && subMenuItem == j) printf(">> %s\t\t", current->data);
+		if (item == current) printf(">> %s\t\t", current->data);
 		else printf("%s\t\t", current->data);
 		current = current->next;
-		i++;
 	}
 	printf("\n\n");
-	j++;
 	
 	Node** currentHeads = calloc(menu->subMenus, sizeof(Node));
 	for(i = 0; i < menu->subMenus; i++) {
@@ -71,7 +68,7 @@ void displayMenu(Menu* menu, int menuItem, int subMenuItem) {
 	while(allNull == 0) {
 		for(i = 0; i < menu->subMenus; i++) {
 			if (*(currentHeads + i) != NULL) {
-				if (menuItem == i && subMenuItem == j) printf(">> %s\t\t", (*(currentHeads + i))->data);
+				if (subItem == *(currentHeads + i)) printf("> %s\t\t", (*(currentHeads + i))->data);
 				else printf("%s\t\t", (*(currentHeads + i))->data);
 				*(currentHeads + i) = (*(currentHeads + i))->next;
 			}
@@ -81,7 +78,6 @@ void displayMenu(Menu* menu, int menuItem, int subMenuItem) {
 		}
 		if (allNull == menu->subMenus) break;
 		else allNull = 0;
-		j++;
 		printf("\n");
 	}
 	
@@ -91,7 +87,9 @@ void displayMenu(Menu* menu, int menuItem, int subMenuItem) {
 
 int main() {
     Menu menu;
-    int i = 0, j = -1;
+    Node* currentMenu;
+    Node* currentSubMenu;
+    int i = 0;
     char input;
     char menuHeadNames[][MENU_ITEM_SIZE] = {"File", "Edit", "Search"};
     initMenu(&menu, menuHeadNames, 3);
@@ -106,31 +104,47 @@ int main() {
     insertSubMenuItem(&menu, 2, "Find");
     insertSubMenuItem(&menu, 2, "Replace");
     
+    currentMenu = menu.head;
+    currentSubMenu = *menu.subMenuHeads;
+    
     do {
-		displayMenu(&menu, i, j);
+		displayMenu(&menu, currentMenu, currentSubMenu);
 		printf("\n\nEnter W/A/S/D to navigate the menu (X to exit):\t");
 		scanf("%c", &input);
 		switch(input) {
+			case 'd':
 			case 'D':
+				if (currentMenu->next == NULL) {
+					currentMenu = menu.head;
+				}
+				else currentMenu = currentMenu->next;
 				if (i == menu.subMenus - 1) i = 0;
 				else i++;
+				currentSubMenu = *(menu.subMenuHeads + i);
 				break;
+			case 'a':
 			case 'A':
+				currentMenu = currentMenu->prev;
 				if (i == 0) i = menu.subMenus - 1;
 				else i--;
+				currentSubMenu = *(menu.subMenuHeads + i);
 				break;
+			case 'w':
 			case 'W':
-				if (j == -1) j = menu.subMenus - 1; //gotta replace this :/
-				else j--;
+				currentSubMenu = currentSubMenu->prev;
 				break;
+			case 's':
 			case 'S':
-				if (j == menu.subMenus - 1) j = -1; //this too
-				else j++;
+				if (currentSubMenu->next == NULL) {
+					currentSubMenu = *(menu.subMenuHeads + i);
+				}
+				else currentSubMenu = currentSubMenu->next;
 				break;
+			case 'x':
 			case 'X':
 				printf("Exiting...");
 		}
-	} while (input != 'X');
+	} while (input != 'X' && input != 'x');
     
     return 0;
 }
