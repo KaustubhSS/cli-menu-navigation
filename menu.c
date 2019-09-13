@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <termios.h>
+#include <unistd.h>
 #define MENU_ITEM_SIZE 32
 
 typedef struct Node {
@@ -53,7 +55,7 @@ void displayMenu(Menu* menu, Node* item, Node* subItem) {
 	int i = 0;
 	int allNull = 0;
 	Node* current = menu->head;
-	system("cls || clear");
+	system("clear || cls");
 	while(current != NULL) {
 		if (item == current) printf(">> %s\t\t", current->data);
 		else printf("%s\t\t", current->data);
@@ -85,6 +87,8 @@ void displayMenu(Menu* menu, Node* item, Node* subItem) {
 	free(currentHeads);
 }
 
+/* reads from keypress, doesn't echo */ int getch(void) { struct termios oldattr, newattr; int ch; tcgetattr( STDIN_FILENO, &oldattr ); newattr = oldattr; newattr.c_lflag &= ~( ICANON | ECHO ); tcsetattr( STDIN_FILENO, TCSANOW, &newattr ); ch = getchar(); tcsetattr( STDIN_FILENO, TCSANOW, &oldattr ); return ch; }
+
 int main() {
     Menu menu;
     Node* currentMenu;
@@ -109,8 +113,9 @@ int main() {
     
     do {
 		displayMenu(&menu, currentMenu, currentSubMenu);
-		printf("\n\nEnter W/A/S/D to navigate the menu (X to exit):\t");
-		scanf("%c", &input);
+		printf("\n\nEnter W/A/S/D to navigate the menu (X to exit)");
+		//scanf("%c", &input);
+		input = (char)getch();
 		switch(input) {
 			case 'd':
 			case 'D':
@@ -142,7 +147,7 @@ int main() {
 				break;
 			case 'x':
 			case 'X':
-				printf("Exiting...");
+				printf("\nExiting...\n");
 		}
 	} while (input != 'X' && input != 'x');
     
