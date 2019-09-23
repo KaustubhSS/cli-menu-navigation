@@ -48,7 +48,7 @@ void startProcess() {
     do {
 		displayMenu(&menu, currentMenu, currentSubMenu);
 		printf("\n\nEnter W/A/S/D to navigate the menu (X to exit)");
-		input = (char)getch();
+		input = getch();
 		switch(input) {
 			case 'd':
 			case 'D':
@@ -75,6 +75,27 @@ void startProcess() {
 			case 'x':
 			case 'X':
 				printf("\nExiting...\n");
+			default:
+				switch(getch()) { //get arrow key
+					case 72:
+						currentSubMenu = currentSubMenu->prev; //up
+						break;
+					case 80:
+						currentSubMenu = currentSubMenu->next; //down
+						break;
+					case 77:
+						currentMenu = currentMenu->next; //right
+						if (i == menu.subMenus - 1) i = 0;
+						else i++;
+						currentSubMenu = *(menu.subMenuHeads + i);
+						break;
+					case 75:
+						currentMenu = currentMenu->prev; //left
+						if (i == 0) i = menu.subMenus - 1;
+						else i--;
+						currentSubMenu = *(menu.subMenuHeads + i);
+						break;
+				}
 		}
 	} while (input != 'X' && input != 'x');
 }

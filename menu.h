@@ -89,9 +89,7 @@ void displayMenu(Menu* menu, Node* item, Node* subItem) {
 			}
 		}
 		printf("\n");
-		if (allDone == menu->subMenus) {
-			break;
-		}
+		if (allDone == menu->subMenus) break;
 		else allDone = 0;
 	}
 	
