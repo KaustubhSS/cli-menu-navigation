@@ -67,6 +67,7 @@ void displayMenu(Menu* menu, Node* item, Node* subItem) {
 	printf("\n\n");
 	
 	Node** currentHeads = (Node**)calloc((size_t)menu->subMenus, sizeof(Node));
+	int* headDonePrinting = (int*)calloc((size_t)menu->subMenus, sizeof(int));
 	for(i = 0; i < menu->subMenus; i++) {
 		*(currentHeads + i) = *(menu->subMenuHeads + i);
 	}
@@ -77,20 +78,18 @@ void displayMenu(Menu* menu, Node* item, Node* subItem) {
 				else printf("%s\t\t", (*(currentHeads + i))->data);
 				*(currentHeads + i) = (*(currentHeads + i))->next;
 			}
-		}
-		for(i = 0; i < menu->subMenus; i++) {
-			if ((*(currentHeads + i))->next == *(menu->subMenuHeads + i)) allDone++;
+			else {
+				allDone++;
+				if (*(headDonePrinting + i) == 0) {
+					//printing last element
+					if (subItem == *(currentHeads + i)) printf("> %s\t\t", (*(currentHeads + i))->data);
+					else printf("%s\t\t", (*(currentHeads + i))->data);
+					*(headDonePrinting + i) = 1;
+				}
+			}
 		}
 		printf("\n");
 		if (allDone == menu->subMenus) {
-			//print last elements
-			for(i = 0; i < menu->subMenus; i++) {
-				if ((*(currentHeads + i)) != *(menu->subMenuHeads + i)) {
-					if (subItem == *(currentHeads + i)) printf("> %s\t\t", (*(currentHeads + i))->data);
-					else printf("%s\t\t", (*(currentHeads + i))->data);
-					*(currentHeads + i) = (*(currentHeads + i))->next;
-				}
-			}
 			break;
 		}
 		else allDone = 0;
@@ -98,4 +97,5 @@ void displayMenu(Menu* menu, Node* item, Node* subItem) {
 	
 	printf("\n\n");
 	free(currentHeads);
+	free(headDonePrinting);
 }

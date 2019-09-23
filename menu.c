@@ -18,25 +18,29 @@
 	}
 #endif
 
-int main() {
-    Menu menu;
+void generateMenu(Menu* menu) {
+	char menuHeadNames[][MENU_ITEM_SIZE] = {"File", "Edit", "Search", "Help"};
+    initMenu(menu, menuHeadNames, 4);
+    insertSubMenuItem(menu, 0, "New");
+    insertSubMenuItem(menu, 0, "Open");
+    insertSubMenuItem(menu, 0, "Save");
+    insertSubMenuItem(menu, 0, "Save As");
+    insertSubMenuItem(menu, 1, "Cut");
+    insertSubMenuItem(menu, 1, "Copy");
+    insertSubMenuItem(menu, 1, "Paste");
+    insertSubMenuItem(menu, 1, "Delete");
+    insertSubMenuItem(menu, 2, "Find");
+    insertSubMenuItem(menu, 2, "Replace");
+    insertSubMenuItem(menu, 3, "About");
+}
+
+void startProcess() {
+	Menu menu;
     Node* currentMenu;
     Node* currentSubMenu;
     int i = 0;
     char input;
-    char menuHeadNames[][MENU_ITEM_SIZE] = {"File", "Edit", "Search"};
-    
-    initMenu(&menu, menuHeadNames, 3);
-    insertSubMenuItem(&menu, 0, "New");
-    insertSubMenuItem(&menu, 0, "Open");
-    insertSubMenuItem(&menu, 0, "Save");
-    insertSubMenuItem(&menu, 0, "Save As");
-    insertSubMenuItem(&menu, 1, "Cut");
-    insertSubMenuItem(&menu, 1, "Copy");
-    insertSubMenuItem(&menu, 1, "Paste");
-    insertSubMenuItem(&menu, 1, "Delete");
-    insertSubMenuItem(&menu, 2, "Find");
-    insertSubMenuItem(&menu, 2, "Replace");
+    generateMenu(&menu);
     
     currentMenu = menu.head;
     currentSubMenu = *menu.subMenuHeads;
@@ -73,6 +77,9 @@ int main() {
 				printf("\nExiting...\n");
 		}
 	} while (input != 'X' && input != 'x');
-    
+}
+
+int main() {
+    startProcess();
     return 0;
 }
