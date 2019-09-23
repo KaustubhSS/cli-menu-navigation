@@ -8,12 +8,19 @@
 	int getch() {
 		struct termios oldattr, newattr;
 		int ch;
-		tcgetattr(STDIN_FILENO, &oldattr);
+		tcgetattr(STDIN_FILENO, &oldattr); //getting old attributes of terminal
 		newattr = oldattr;
+		/*
+		 * The following line modifies the local terminal modes.
+		 * It disables ICANON and ECHO
+		 * Disabling ICANON disables canonical mode/line editing mode.
+		 * When ICANON is disabled, the input is made available to the program immediately.
+		 * Disabling ECHO ensures that any input is not re-echoed as output.
+		 * */
 		newattr.c_lflag &= ~(ICANON | ECHO);
-		tcsetattr(STDIN_FILENO, TCSANOW, &newattr);
-		ch = getchar();
-		tcsetattr(STDIN_FILENO, TCSANOW, &oldattr);
+		tcsetattr(STDIN_FILENO, TCSANOW, &newattr); //setting new attributes to terminal
+		ch = getchar(); //getting character
+		tcsetattr(STDIN_FILENO, TCSANOW, &oldattr); //resetting old attributes of terminal
 		return ch;
 	}
 #endif
@@ -38,64 +45,50 @@ void startProcess() {
 	Menu menu;
     Node* currentMenu;
     Node* currentSubMenu;
-    int i = 0;
     char input;
     generateMenu(&menu);
-    
     currentMenu = menu.head;
-    currentSubMenu = *menu.subMenuHeads;
-    
+    currentSubMenu = NULL;
     do {
+		system("clear || cls"); //clear screen
+		printf("Use arrow keys to navigate the menu (X to exit)\n"
+			"You can also use the first letter of each menu to jump to it\n\n");
 		displayMenu(&menu, currentMenu, currentSubMenu);
-		printf("\n\nEnter W/A/S/D to navigate the menu (X to exit)");
-		input = getch();
-		switch(input) {
-			case 'd':
-			case 'D':
+		
+		if ((input = getch()) == 'X') {
+			printf("\nExiting...\n");
+		}
+		else if (input == 'f' || input == 'F') {
+			currentMenu = menu.head;
+			currentSubMenu = *(menu.subMenuHeads + currentMenu->id);
+		}
+		else if (input == 'e' || input == 'E') {
+			currentMenu = menu.head->next;
+			currentSubMenu = *(menu.subMenuHeads + currentMenu->id);
+		}
+		else if (input == 's' || input == 'S') {
+			currentMenu = menu.head->next->next;
+			currentSubMenu = *(menu.subMenuHeads + currentMenu->id);
+		}
+		else if (input == 'h' || input == 'H') {
+			currentMenu = menu.head->next->next->next;
+			currentSubMenu = *(menu.subMenuHeads + currentMenu->id);
+		}
+		else switch(getch()) { //get arrow key
+			case 72: //up
+				if (currentSubMenu != NULL) currentSubMenu = currentSubMenu->prev;
+				break;
+			case 80: //down
+				currentSubMenu = currentSubMenu == NULL ? *(menu.subMenuHeads + currentMenu->id) : currentSubMenu->next;
+				break;
+			case 77: //right
 				currentMenu = currentMenu->next;
-				if (i == menu.subMenus - 1) i = 0;
-				else i++;
-				currentSubMenu = *(menu.subMenuHeads + i);
+				currentSubMenu = NULL;
 				break;
-			case 'a':
-			case 'A':
+			case 75: //left
 				currentMenu = currentMenu->prev;
-				if (i == 0) i = menu.subMenus - 1;
-				else i--;
-				currentSubMenu = *(menu.subMenuHeads + i);
+				currentSubMenu = NULL;
 				break;
-			case 'w':
-			case 'W':
-				currentSubMenu = currentSubMenu->prev;
-				break;
-			case 's':
-			case 'S':
-				currentSubMenu = currentSubMenu->next;
-				break;
-			case 'x':
-			case 'X':
-				printf("\nExiting...\n");
-			default:
-				switch(getch()) { //get arrow key
-					case 72:
-						currentSubMenu = currentSubMenu->prev; //up
-						break;
-					case 80:
-						currentSubMenu = currentSubMenu->next; //down
-						break;
-					case 77:
-						currentMenu = currentMenu->next; //right
-						if (i == menu.subMenus - 1) i = 0;
-						else i++;
-						currentSubMenu = *(menu.subMenuHeads + i);
-						break;
-					case 75:
-						currentMenu = currentMenu->prev; //left
-						if (i == 0) i = menu.subMenus - 1;
-						else i--;
-						currentSubMenu = *(menu.subMenuHeads + i);
-						break;
-				}
 		}
 	} while (input != 'X' && input != 'x');
 }

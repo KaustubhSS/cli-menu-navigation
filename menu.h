@@ -7,6 +7,7 @@ typedef struct Node {
     struct Node* next;
     struct Node* prev;
     char data[MENU_ITEM_SIZE];
+    int id;
 } Node;
 
 typedef struct {
@@ -15,11 +16,12 @@ typedef struct {
 	Node** subMenuHeads;
 } Menu;
 
-void insert(Node** head, const char* item) {
+void insert(Node** head, const char* item, int id) {
 	Node* temp;
     if (*head == NULL) {
         *head = (Node*)malloc(sizeof(Node));
         strcpy((*head)->data, item);
+        (*head)->id = id;
         (*head)->next = *head;
         (*head)->prev = *head;
     }
@@ -28,6 +30,7 @@ void insert(Node** head, const char* item) {
 		temp->next = *head;
 		temp->prev = (*head)->prev;
 		strcpy(temp->data, item);
+		temp->id = id;
 		(*head)->prev->next = temp;
 		(*head)->prev = temp;
     }
@@ -37,7 +40,7 @@ void initMenu(Menu* menu, char menuHeadNames[][MENU_ITEM_SIZE], int subMenus) {
 	int i;
 	menu->head = NULL;
 	for(i = 0; i < subMenus; i++) {
-		insert(&menu->head, menuHeadNames[i]);
+		insert(&menu->head, menuHeadNames[i], i);
 	}
 	menu->subMenus = subMenus;
 	menu->subMenuHeads = (Node**)calloc((size_t)subMenus, sizeof(Node));
@@ -48,14 +51,13 @@ void initMenu(Menu* menu, char menuHeadNames[][MENU_ITEM_SIZE], int subMenus) {
 
 void insertSubMenuItem(Menu* menu, int subMenu, const char* text) {
 	if (subMenu >= menu->subMenus) return; //illegal memory access!
-	insert(menu->subMenuHeads + subMenu, text);
+	insert(menu->subMenuHeads + subMenu, text, subMenu);
 }
 
 void displayMenu(Menu* menu, Node* item, Node* subItem) {
 	int i = 0;
-	int allDone = 0;
 	Node* current = menu->head;
-	system("clear || cls");
+	//print main menu
 	while(current->next != menu->head) {
 		if (item == current) printf(">> %s\t\t", current->data);
 		else printf("%s\t\t", current->data);
@@ -64,36 +66,19 @@ void displayMenu(Menu* menu, Node* item, Node* subItem) {
 	//once more for last element
 	if (item == current) printf(">> %s\t\t", current->data);
 	else printf("%s\t\t", current->data);
-	printf("\n\n");
-	
-	Node** currentHeads = (Node**)calloc((size_t)menu->subMenus, sizeof(Node));
-	int* headDonePrinting = (int*)calloc((size_t)menu->subMenus, sizeof(int));
-	for(i = 0; i < menu->subMenus; i++) {
-		*(currentHeads + i) = *(menu->subMenuHeads + i);
-	}
-	while(allDone == 0) {
-		for(i = 0; i < menu->subMenus; i++) {
-			if ((*(currentHeads + i))->next != *(menu->subMenuHeads + i)) {
-				if (subItem == *(currentHeads + i)) printf("> %s\t\t", (*(currentHeads + i))->data);
-				else printf("%s\t\t", (*(currentHeads + i))->data);
-				*(currentHeads + i) = (*(currentHeads + i))->next;
-			}
-			else {
-				allDone++;
-				if (*(headDonePrinting + i) == 0) {
-					//printing last element
-					if (subItem == *(currentHeads + i)) printf("> %s\t\t", (*(currentHeads + i))->data);
-					else printf("%s\t\t", (*(currentHeads + i))->data);
-					*(headDonePrinting + i) = 1;
-				}
-			}
+	printf("\n");
+	//print submenu
+	if (subItem != NULL) {
+		current = *(menu->subMenuHeads + item->id);
+		while(current->next != *(menu->subMenuHeads + item->id)) {
+			for(i = 0; i < item->id; i++) printf("\t\t");
+			if (subItem == current) printf("> %s\n", current->data);
+			else printf("%s\n", current->data);
+			current = current->next;
 		}
-		printf("\n");
-		if (allDone == menu->subMenus) break;
-		else allDone = 0;
+		//once more for last element
+		for(i = 0; i < item->id; i++) printf("\t\t");
+		if (subItem == current) printf("> %s\n", current->data);
+		else printf("%s\n", current->data);
 	}
-	
-	printf("\n\n");
-	free(currentHeads);
-	free(headDonePrinting);
 }
