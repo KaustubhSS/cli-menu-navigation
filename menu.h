@@ -4,10 +4,10 @@
 #define MENU_ITEM_SIZE 32
 
 typedef struct Node {
-    struct Node* next;
-    struct Node* prev;
-    char data[MENU_ITEM_SIZE];
-    int id;
+	struct Node* next;
+	struct Node* prev;
+	char data[MENU_ITEM_SIZE];
+	int id;
 } Node;
 
 typedef struct {
@@ -18,14 +18,14 @@ typedef struct {
 
 void insert(Node** head, const char* item, int id) {
 	Node* temp;
-    if (*head == NULL) {
-        *head = (Node*)malloc(sizeof(Node));
-        strcpy((*head)->data, item);
-        (*head)->id = id;
-        (*head)->next = *head;
-        (*head)->prev = *head;
-    }
-    else {
+	if (*head == NULL) {
+        	*head = (Node*)malloc(sizeof(Node));
+        	strcpy((*head)->data, item);
+        	(*head)->id = id;
+        	(*head)->next = *head;
+        	(*head)->prev = *head;
+	}
+	else {
 		temp = (Node*)malloc(sizeof(Node));
 		temp->next = *head;
 		temp->prev = (*head)->prev;
@@ -33,7 +33,7 @@ void insert(Node** head, const char* item, int id) {
 		temp->id = id;
 		(*head)->prev->next = temp;
 		(*head)->prev = temp;
-    }
+	}
 }
 
 void initMenu(Menu* menu, char menuHeadNames[][MENU_ITEM_SIZE], int subMenus) {
