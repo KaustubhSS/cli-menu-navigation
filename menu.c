@@ -27,29 +27,29 @@
 
 void generateMenu(Menu* menu) {
 	char menuHeadNames[][MENU_ITEM_SIZE] = {"File", "Edit", "Search", "Help"};
-    initMenu(menu, menuHeadNames, 4);
-    insertSubMenuItem(menu, 0, "New");
-    insertSubMenuItem(menu, 0, "Open");
-    insertSubMenuItem(menu, 0, "Save");
-    insertSubMenuItem(menu, 0, "Save As");
-    insertSubMenuItem(menu, 1, "Cut");
-    insertSubMenuItem(menu, 1, "Copy");
-    insertSubMenuItem(menu, 1, "Paste");
-    insertSubMenuItem(menu, 1, "Delete");
-    insertSubMenuItem(menu, 2, "Find");
-    insertSubMenuItem(menu, 2, "Replace");
-    insertSubMenuItem(menu, 3, "About");
+	initMenu(menu, menuHeadNames, 4);
+	insertSubMenuItem(menu, 0, "New");
+	insertSubMenuItem(menu, 0, "Open");
+	insertSubMenuItem(menu, 0, "Save");
+	insertSubMenuItem(menu, 0, "Save As");
+	insertSubMenuItem(menu, 1, "Cut");
+	insertSubMenuItem(menu, 1, "Copy");
+	insertSubMenuItem(menu, 1, "Paste");
+	insertSubMenuItem(menu, 1, "Delete");
+	insertSubMenuItem(menu, 2, "Find");
+	insertSubMenuItem(menu, 2, "Replace");
+	insertSubMenuItem(menu, 3, "About");
 }
 
 void startProcess() {
 	Menu menu;
-    Node* currentMenu;
-    Node* currentSubMenu;
-    char input;
-    generateMenu(&menu);
-    currentMenu = menu.head;
-    currentSubMenu = NULL;
-    do {
+	Node* currentMenu;
+	Node* currentSubMenu;
+	char input;
+	generateMenu(&menu);
+	currentMenu = menu.head;
+	currentSubMenu = NULL;
+	do {
 		system("clear || cls"); //clear screen
 		printf("Use arrow keys to navigate the menu (X to exit)\n"
 			"You can also use the first letter of each menu to jump to it\n\n");
@@ -74,6 +74,7 @@ void startProcess() {
 			currentMenu = menu.head->next->next->next;
 			currentSubMenu = *(menu.subMenuHeads + currentMenu->id);
 		}
+		#ifdef _WIN32
 		else switch(getch()) { //get arrow key
 			case 72: //up
 				if (currentSubMenu != NULL) currentSubMenu = currentSubMenu->prev;
@@ -90,10 +91,31 @@ void startProcess() {
 				currentSubMenu = NULL;
 				break;
 		}
+		#elif __linux__
+		else if (input == '\033') { //control key
+			getch(); //skip '['
+			switch(getch()) { //get arrow key
+				case 'A': //up
+					if (currentSubMenu != NULL) currentSubMenu = currentSubMenu->prev;
+					break;
+				case 'B': //down
+					currentSubMenu = currentSubMenu == NULL ? *(menu.subMenuHeads + currentMenu->id) : currentSubMenu->next;
+					break;
+				case 'C': //right
+					currentMenu = currentMenu->next;
+					currentSubMenu = NULL;
+					break;
+				case 'D': //left
+					currentMenu = currentMenu->prev;
+					currentSubMenu = NULL;
+					break;
+			}
+		}
+		#endif
 	} while (input != 'X' && input != 'x');
 }
 
 int main() {
-    startProcess();
-    return 0;
+	startProcess();
+	return 0;
 }
