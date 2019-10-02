@@ -50,7 +50,13 @@ void startProcess() {
 	currentMenu = menu.head;
 	currentSubMenu = NULL;
 	do {
-		system("clear || cls"); //clear screen
+		//clearing screen
+		#ifdef _WIN32
+			system("cls");
+		#elif __linux__
+			system("clear");
+		#endif
+		
 		printf("Use arrow keys to navigate the menu (X to exit)\n"
 			"You can also use the first letter of each menu to jump to it\n\n");
 		displayMenu(&menu, currentMenu, currentSubMenu);
