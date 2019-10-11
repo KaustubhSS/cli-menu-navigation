@@ -1,10 +1,12 @@
-#include "menu.h"
+#include<menu.h>
 
 #ifdef _WIN32
 	#include <conio.h>
+	#include <time.h> 
 #elif __linux__
 	#include <termios.h>
 	#include <unistd.h>
+	
 	int getch() {
 		struct termios oldattr, newattr;
 		int ch;
@@ -25,6 +27,17 @@
 	}
 #endif
 
+void delay(int milli_seconds) 
+{ 
+  
+    // Stroing start time 
+    clock_t start_time = clock(); 
+  
+    // looping till required time is not acheived 
+    while (clock() < start_time + milli_seconds) 
+        ; 
+	}
+	
 void generateMenu(Menu* menu) {
 	char menuHeadNames[][MENU_ITEM_SIZE] = {"File", "Edit", "Search", "Help"};
 	initMenu(menu, menuHeadNames, 4);
@@ -67,18 +80,26 @@ void startProcess() {
 		else if (input == 'f' || input == 'F') {
 			currentMenu = menu.head;
 			currentSubMenu = *(menu.subMenuHeads + currentMenu->id);
+			printf("\nyou are on File Menu\n");
+			delay(500);
 		}
 		else if (input == 'e' || input == 'E') {
 			currentMenu = menu.head->next;
 			currentSubMenu = *(menu.subMenuHeads + currentMenu->id);
+			printf("\nyou are on Input menu\n");
+			delay(500);
 		}
 		else if (input == 's' || input == 'S') {
 			currentMenu = menu.head->next->next;
 			currentSubMenu = *(menu.subMenuHeads + currentMenu->id);
+			printf("\nyou are on Search menu\n");
+			delay(500);
 		}
 		else if (input == 'h' || input == 'H') {
 			currentMenu = menu.head->next->next->next;
 			currentSubMenu = *(menu.subMenuHeads + currentMenu->id);
+			printf("\nyou are on Help menu\n");
+			delay(500);
 		}
 		#ifdef _WIN32
 		else switch(getch()) { //get arrow key
@@ -125,3 +146,4 @@ int main() {
 	startProcess();
 	return 0;
 }
+
